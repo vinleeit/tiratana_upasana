@@ -1,17 +1,19 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 part 'stopwatch_event.dart';
 part 'stopwatch_state.dart';
 
-class StopwatchBloc extends Bloc<StopwatchEvent, StopwatchState> {
-  StopwatchBloc() : super(const StopwatchInitial()) {
-    on<StopwatchStartEvent>(_onStart);
-    on<StopwatchStopEvent>(_onStop);
-    on<StopwatchResetEvent>(_onReset);
-    on<_StopwatchTickEvent>(_onTick);
+class StopwatchBloc extends Bloc<MeditationTimerEvent, MeditationTimerState> {
+  StopwatchBloc() : super(const MeditationTimerInitial()) {
+    on<StartTimer>(_onStartTimer);
+    on<_TimerTick>(_onTimerTick);
+    on<StopTimer>(_onStopTimer);
+    on<UpdateNote>(_onUpdateNote);
+    on<SaveRecord>(_onSaveRecord);
   }
 
   static const int _tickDuration = 1000; // milliseconds
@@ -23,29 +25,69 @@ class StopwatchBloc extends Bloc<StopwatchEvent, StopwatchState> {
     return super.close();
   }
 
-  void _onStart(StopwatchStartEvent event, Emitter<StopwatchState> emit) {
-    emit(StopwatchRunning(state.elapsed, DateTime.now()));
-    _timer?.cancel();
-    _timer = Timer.periodic(
-      const Duration(milliseconds: _tickDuration),
-      (timer) =>
-          add(_StopwatchTickEvent(elapsed: state.elapsed + _tickDuration)),
-    );
-  }
-
-  void _onStop(StopwatchStopEvent event, Emitter<StopwatchState> emit) {
-    debugPrint('Stopped: ${state.elapsed} | ${state.startTime}');
-    if (state is StopwatchRunning) {
+  void _onStartTimer(StartTimer event, Emitter<MeditationTimerState> emit) {
+    if (state is MeditationTimerInitial) {
+      emit(
+        MeditationTimerRunning(
+          startTime: DateTime.now(),
+          elapsed: state.elapsed,
+        ),
+      );
       _timer?.cancel();
-      emit(StopwatchStopped(state.elapsed, state.startTime));
+      _timer = Timer.periodic(
+        const Duration(milliseconds: _tickDuration),
+        (timer) => add(_TimerTick(elapsed: state.elapsed + _tickDuration)),
+      );
     }
   }
 
-  void _onTick(_StopwatchTickEvent event, Emitter<StopwatchState> emit) {
-    emit(StopwatchRunning(event.elapsed, state.startTime));
+  void _onTimerTick(_TimerTick event, Emitter<MeditationTimerState> emit) {
+    emit(
+      MeditationTimerRunning(
+        startTime: state.startTime,
+        elapsed: event.elapsed,
+      ),
+    );
   }
 
-  void _onReset(StopwatchResetEvent event, Emitter<StopwatchState> emit) {
-    emit(const StopwatchInitial());
+  void _onStopTimer(StopTimer event, Emitter<MeditationTimerState> emit) {
+    if (state is MeditationTimerRunning) {
+      _timer?.cancel();
+      emit(
+        MeditationTimerStopped(
+          startTime: state.startTime,
+          elapsed: state.elapsed,
+          note: '',
+        ),
+      );
+    }
+  }
+
+  void _onUpdateNote(UpdateNote event, Emitter<MeditationTimerState> emit) {
+    if (state is MeditationTimerStopped) {
+      final currentState = state as MeditationTimerStopped;
+      emit(
+        MeditationTimerStopped(
+          startTime: currentState.startTime,
+          elapsed: currentState.elapsed,
+          note: event.note,
+        ),
+      );
+    }
+  }
+
+  Future<void> _onSaveRecord(
+    SaveRecord event,
+    Emitter<MeditationTimerState> emit,
+  ) async {
+    if (state is MeditationTimerStopped) {
+      final currentState = state as MeditationTimerStopped;
+      try {
+        // TODO: Save data to database
+        emit(const MeditationTimerInitial());
+      } catch (e) {
+        // TODO: Add error state
+      }
+    }
   }
 }

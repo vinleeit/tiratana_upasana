@@ -68,7 +68,7 @@ class MeditationWatchView extends StatelessWidget {
                             const SelectableText(
                               'Elapsed time:',
                             ),
-                            BlocBuilder<StopwatchBloc, StopwatchState>(
+                            BlocBuilder<StopwatchBloc, MeditationTimerState>(
                               builder: (context, state) {
                                 final elapsed = state.elapsed;
                                 final minutes = ((elapsed / 1000) / 60)
@@ -94,10 +94,10 @@ class MeditationWatchView extends StatelessWidget {
                       const SizedBox(height: 16),
                       Expanded(
                         flex: 5,
-                        child: BlocBuilder<StopwatchBloc, StopwatchState>(
+                        child: BlocBuilder<StopwatchBloc, MeditationTimerState>(
                           builder: (context, state) {
                             return Visibility(
-                              visible: state is StopwatchStopped,
+                              visible: state is MeditationTimerStopped,
                               child: Padding(
                                 padding: const EdgeInsets.only(
                                   left: 56,
@@ -107,6 +107,11 @@ class MeditationWatchView extends StatelessWidget {
                                 child: TextField(
                                   maxLines: 5,
                                   scrollPhysics: const BouncingScrollPhysics(),
+                                  onChanged: (text) {
+                                    context
+                                        .read<StopwatchBloc>()
+                                        .add(UpdateNote(note: text ?? ''));
+                                  },
                                   decoration: InputDecoration(
                                     border: const OutlineInputBorder(),
                                     label: const Text('Note'),
@@ -126,7 +131,7 @@ class MeditationWatchView extends StatelessWidget {
                           },
                         ),
                       ),
-                      BlocBuilder<StopwatchBloc, StopwatchState>(
+                      BlocBuilder<StopwatchBloc, MeditationTimerState>(
                         builder: (context, state) {
                           return Padding(
                             padding: EdgeInsets.only(
@@ -137,31 +142,31 @@ class MeditationWatchView extends StatelessWidget {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                if (state is StopwatchInitial)
+                                if (state is MeditationTimerInitial)
                                   IconButton(
                                     onPressed: () => context
                                         .read<StopwatchBloc>()
-                                        .add(const StopwatchStartEvent()),
+                                        .add(const StartTimer()),
                                     icon: const Icon(
                                       Icons.play_arrow_outlined,
                                     ),
                                     tooltip: 'Start',
                                   ),
-                                if (state is StopwatchRunning)
+                                if (state is MeditationTimerRunning)
                                   IconButton(
                                     onPressed: () => context
                                         .read<StopwatchBloc>()
-                                        .add(const StopwatchStopEvent()),
+                                        .add(const StopTimer()),
                                     icon: const Icon(
                                       Icons.stop_outlined,
                                     ),
                                     tooltip: 'Stop',
                                   ),
-                                if (state is StopwatchStopped)
+                                if (state is MeditationTimerStopped)
                                   IconButton(
                                     onPressed: () => context
                                         .read<StopwatchBloc>()
-                                        .add(const StopwatchResetEvent()),
+                                        .add(const SaveRecord()),
                                     icon: const Icon(
                                       Icons.check,
                                     ),
