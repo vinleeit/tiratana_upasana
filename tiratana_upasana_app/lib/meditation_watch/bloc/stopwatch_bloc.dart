@@ -3,19 +3,45 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:tiratana_upasana_app/models/meditation_record.dart';
+import 'package:tiratana_upasana_app/objectbox.g.dart';
+import 'package:tiratana_upasana_app/repositories/meditation_record_repository.dart';
 
 part 'stopwatch_event.dart';
 part 'stopwatch_state.dart';
 
 class StopwatchBloc extends Bloc<MeditationTimerEvent, MeditationTimerState> {
-  StopwatchBloc() : super(const MeditationTimerInitial()) {
+  StopwatchBloc({
+    required MeditationRecordRepository meditationRecordRepository,
+  })  : _meditationRecordRepository = meditationRecordRepository,
+        super(const MeditationTimerInitial()) {
     on<StartTimer>(_onStartTimer);
     on<_TimerTick>(_onTimerTick);
     on<StopTimer>(_onStopTimer);
     on<UpdateNote>(_onUpdateNote);
     on<SaveRecord>(_onSaveRecord);
+
+    final meditationRecords = _meditationRecordRepository.store
+        .box<MeditationRecord>()
+        .query()
+        .order(MeditationRecord_.meditationStartTime)
+        .build()
+        .find();
+
+    final groupedMeditationRecord = <String, List<MeditationRecord>>{};
+    for (final meditationRecord in meditationRecords) {
+      final startDateStr = DateFormat.yMMMd().format(
+        meditationRecord.meditationStartTime,
+      );
+      if (!groupedMeditationRecord.containsKey(startDateStr)) {
+        groupedMeditationRecord[startDateStr] = [];
+      }
+      groupedMeditationRecord[startDateStr]?.add(meditationRecord);
+    }
   }
 
+  late final MeditationRecordRepository _meditationRecordRepository;
   static const int _tickDuration = 1000; // milliseconds
   Timer? _timer;
 
@@ -80,14 +106,6 @@ class StopwatchBloc extends Bloc<MeditationTimerEvent, MeditationTimerState> {
     SaveRecord event,
     Emitter<MeditationTimerState> emit,
   ) async {
-    if (state is MeditationTimerStopped) {
-      final currentState = state as MeditationTimerStopped;
-      try {
-        // TODO: Save data to database
-        emit(const MeditationTimerInitial());
-      } catch (e) {
-        // TODO: Add error state
-      }
-    }
+    emit(const MeditationTimerInitial());
   }
 }

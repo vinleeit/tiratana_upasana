@@ -3,8 +3,6 @@ import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
-import 'package:hive_ce_flutter/hive_flutter.dart';
-import 'package:tiratana_upasana_app/models/meditation_record.dart';
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
@@ -24,12 +22,6 @@ class AppBlocObserver extends BlocObserver {
 
 Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize Hive
-  await Hive.initFlutter();
-
-  // Register Hive adapters
-  Hive.registerAdapter(MeditationRecordAdapter());
 
   FlutterError.onError = (details) {
     log(details.exceptionAsString(), stackTrace: details.stack);
