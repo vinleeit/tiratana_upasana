@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tiratana_upasana_app/home/view/home_page.dart';
 import 'package:tiratana_upasana_app/l10n/arb/app_localizations.dart';
-import 'package:tiratana_upasana_app/meditation_watch/view/meditation_watch_page.dart';
 import 'package:tiratana_upasana_app/repositories/meditation_record_repository.dart';
 import 'package:tiratana_upasana_app/repositories/store_repository.dart';
 
@@ -32,7 +32,7 @@ class App extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: const MeditationWatchPage(),
+          home: HomePage(),
         ),
       ),
     );

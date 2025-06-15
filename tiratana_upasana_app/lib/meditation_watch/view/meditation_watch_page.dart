@@ -38,10 +38,9 @@ class MeditationWatchView extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Meditation Watch'),
-          bottom: const TabBar(
+      child: Column(
+        children: [
+          const TabBar(
             tabs: [
               Tab(
                 child: Text('Stopwatch'),
@@ -51,31 +50,33 @@ class MeditationWatchView extends StatelessWidget {
               ),
             ],
           ),
-        ),
-        body: Theme(
-          data: Theme.of(context).copyWith(
-            iconButtonTheme: IconButtonThemeData(
-              style: ButtonStyle(
-                iconSize: WidgetStateProperty.all(42),
-                shape: WidgetStateProperty.all(
-                  RoundedRectangleBorder(
-                    side: const BorderSide(
-                      color: Colors.black54,
-                      width: 2,
+          Theme(
+            data: Theme.of(context).copyWith(
+              iconButtonTheme: IconButtonThemeData(
+                style: ButtonStyle(
+                  iconSize: WidgetStateProperty.all(42),
+                  shape: WidgetStateProperty.all(
+                    RoundedRectangleBorder(
+                      side: const BorderSide(
+                        color: Colors.black54,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.circular(200),
                     ),
-                    borderRadius: BorderRadius.circular(200),
                   ),
                 ),
               ),
             ),
-          ),
-          child: const TabBarView(
-            children: [
-              WatchView(),
-              HistoryView(),
-            ],
-          ),
-        ),
+            child: const Expanded(
+              child: TabBarView(
+                children: [
+                  WatchView(),
+                  HistoryView(),
+                ],
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
