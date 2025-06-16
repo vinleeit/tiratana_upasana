@@ -31,9 +31,15 @@ class AppDrawer extends StatelessWidget {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(8),
-                    child: Text(
-                      'Tiratana Upasana',
-                      style: Theme.of(context).textTheme.headlineSmall,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Tiratana Upasana',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const Text('1.0.0+2'),
+                      ],
                     ),
                   ),
                 ),
@@ -45,7 +51,7 @@ class AppDrawer extends StatelessWidget {
                     children: [
                       for (final (index, title)
                           in ['Meditation Watch', 'Chant'].indexed)
-                        OutlinedButton(
+                        ElevatedButton(
                           onPressed: () {
                             controller.jumpToPage(index);
                             Provider.of<PageIndexModel>(context, listen: false)
@@ -55,7 +61,7 @@ class AppDrawer extends StatelessWidget {
                           style: ButtonStyle(
                             shape: WidgetStateProperty.all(
                               RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(60),
                               ),
                             ),
                             backgroundColor: WidgetStateProperty.all(

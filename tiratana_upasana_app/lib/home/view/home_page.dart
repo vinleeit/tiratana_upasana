@@ -8,7 +8,7 @@ import 'package:tiratana_upasana_app/meditation_watch/view/meditation_watch_page
 class HomePage extends StatelessWidget {
   HomePage({super.key});
 
-  final pageController = PageController(initialPage: 0);
+  final pageController = PageController(initialPage: 1);
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
