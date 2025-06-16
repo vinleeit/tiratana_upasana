@@ -15,7 +15,7 @@ class AppDrawer extends StatelessWidget {
     return Drawer(
       child: Padding(
         padding: EdgeInsets.only(
-          top: MediaQuery.of(context).padding.top,
+          top: MediaQuery.of(context).padding.top + 12,
         ),
         child: Consumer<PageIndexModel>(
           builder: (context, value, _) {
@@ -38,7 +38,7 @@ class AppDrawer extends StatelessWidget {
                           'Tiratana Upasana',
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
-                        const Text('1.0.0+2'),
+                        const Text('Version 1.0.0+3'),
                       ],
                     ),
                   ),

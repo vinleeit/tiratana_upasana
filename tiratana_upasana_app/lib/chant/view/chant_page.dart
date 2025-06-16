@@ -3,6 +3,8 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:tiratana_upasana_app/chant/models/chant.dart';
 import 'package:tiratana_upasana_app/chant/view/language_bottom_sheet.dart';
+import 'package:tiratana_upasana_app/chant/view/toc_bottom_sheet.dart';
+import 'package:tiratana_upasana_app/widgets/unimplemented_feature_alert_dialog.dart';
 
 class ChantPage extends StatefulWidget {
   const ChantPage({super.key});
@@ -12,21 +14,12 @@ class ChantPage extends StatefulWidget {
 }
 
 class _ChantPageState extends State<ChantPage> {
-  final currentChantIndex = 0;
-  var currentIsoIndex = 0;
-
-  @override
-  void initState() {
-    currentIsoIndex = chants[currentChantIndex].contents.indexWhere(
-          (element) => element.isDefault,
-        );
-    super.initState();
-  }
+  int currentChantIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     final currentChant = chants[currentChantIndex];
-    final content = currentChant.contents[currentIsoIndex];
+    final currentContent = currentChant.selectedContent;
 
     return Scaffold(
       body: Stack(
@@ -37,7 +30,7 @@ class _ChantPageState extends State<ChantPage> {
             child: Builder(
               builder: (context) {
                 final dataStr = md.markdownToHtml(
-                  '# ${content.title}\n${content.content}',
+                  '# ${currentContent.title}\n${currentContent.content}',
                 );
                 return SelectionArea(
                   child: Html(
@@ -67,9 +60,33 @@ class _ChantPageState extends State<ChantPage> {
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          child: Text(content.title),
+                        child: Tooltip(
+                          message: 'Table of Content',
+                          child: ElevatedButton(
+                            onPressed: () {
+                              showModalBottomSheet<Chant>(
+                                context: context,
+                                showDragHandle: true,
+                                builder: (context) {
+                                  return TocBottomSheet(
+                                    currentChant: currentChant,
+                                    chants: chants.toList(),
+                                  );
+                                },
+                              ).then(
+                                (element) {
+                                  if (element != null) {
+                                    setState(() {
+                                      currentChantIndex = chants.indexWhere(
+                                        (element2) => element2.id == element.id,
+                                      );
+                                    });
+                                  }
+                                },
+                              );
+                            },
+                            child: Text(currentContent.title),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -90,50 +107,14 @@ class _ChantPageState extends State<ChantPage> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ButtonStyle(
-                          padding: WidgetStateProperty.all(
-                            const EdgeInsets.symmetric(
-                              horizontal: 16,
-                            ),
-                          ),
-                          shape: WidgetStateProperty.all(
-                            const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.horizontal(
-                                left: Radius.circular(100),
-                              ),
-                            ),
-                          ),
-                          visualDensity: VisualDensity.compact,
-                        ),
-                        child: const Icon(Icons.dark_mode),
-                      ),
-                      Expanded(
+                      Tooltip(
+                        message: 'Dark Mode',
                         child: ElevatedButton(
-                          onPressed: () {
-                            showModalBottomSheet(
-                              context: context,
-                              showDragHandle: true,
-                              builder: (context) {
-                                return LanguageBottomSheet(
-                                  currentIso: content.iso,
-                                  isos: currentChant.contents
-                                      .map((element) => element.iso)
-                                      .toList()
-                                    ..removeAt(currentIsoIndex),
-                                );
-                              },
-                            ).then((iso) {
-                              if (iso != null) {
-                                setState(() {
-                                  currentIsoIndex = currentChant.contents
-                                      .indexWhere(
-                                          (element) => element.iso == iso);
-                                });
-                              }
-                            });
-                          },
+                          onPressed: () => showDialog<void>(
+                            context: context,
+                            builder: (context) =>
+                                const UnimplementedFeatureAlertDialog(),
+                          ),
                           style: ButtonStyle(
                             padding: WidgetStateProperty.all(
                               const EdgeInsets.symmetric(
@@ -141,42 +122,99 @@ class _ChantPageState extends State<ChantPage> {
                               ),
                             ),
                             shape: WidgetStateProperty.all(
-                              const RoundedRectangleBorder(),
+                              const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.horizontal(
+                                  left: Radius.circular(100),
+                                ),
+                              ),
                             ),
                             visualDensity: VisualDensity.compact,
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.translate),
-                              const Text(': '),
-                              Expanded(
-                                child: Center(
-                                  child: Text(content.iso),
+                          child: const Icon(Icons.dark_mode),
+                        ),
+                      ),
+                      Expanded(
+                        child: Tooltip(
+                          message: 'Language',
+                          child: ElevatedButton(
+                            onPressed: () {
+                              showModalBottomSheet<String?>(
+                                context: context,
+                                showDragHandle: true,
+                                builder: (context) {
+                                  return LanguageBottomSheet(
+                                    currentIso: currentContent.iso,
+                                    isos: currentChant.contents
+                                        .map((element) => element.iso)
+                                        .toList()
+                                      ..removeWhere(
+                                        (element) =>
+                                            element == currentContent.iso,
+                                      ),
+                                  );
+                                },
+                              ).then((iso) {
+                                if (iso != null) {
+                                  setState(() {
+                                    currentChant.selectedContent =
+                                        currentChant.contents.singleWhere(
+                                      (element) => element.iso == iso,
+                                    );
+                                  });
+                                }
+                              });
+                            },
+                            style: ButtonStyle(
+                              padding: WidgetStateProperty.all(
+                                const EdgeInsets.symmetric(
+                                  horizontal: 16,
                                 ),
                               ),
-                            ],
+                              shape: WidgetStateProperty.all(
+                                const RoundedRectangleBorder(),
+                              ),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.translate),
+                                const Text(': '),
+                                Expanded(
+                                  child: Center(
+                                    child: Text(currentContent.iso),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ButtonStyle(
-                          padding: WidgetStateProperty.all(
-                            const EdgeInsets.symmetric(
-                              horizontal: 16,
-                            ),
+                      Tooltip(
+                        message: 'Settings',
+                        child: ElevatedButton(
+                          onPressed: () => showDialog<void>(
+                            context: context,
+                            builder: (context) =>
+                                const UnimplementedFeatureAlertDialog(),
                           ),
-                          shape: WidgetStateProperty.all(
-                            const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.horizontal(
-                                right: Radius.circular(100),
+                          style: ButtonStyle(
+                            padding: WidgetStateProperty.all(
+                              const EdgeInsets.symmetric(
+                                horizontal: 16,
                               ),
                             ),
+                            shape: WidgetStateProperty.all(
+                              const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.horizontal(
+                                  right: Radius.circular(100),
+                                ),
+                              ),
+                            ),
+                            visualDensity: VisualDensity.compact,
                           ),
-                          visualDensity: VisualDensity.compact,
+                          child: const Icon(Icons.settings),
                         ),
-                        child: const Icon(Icons.settings),
                       ),
                       const SizedBox(width: 8),
                       const IconButton(
