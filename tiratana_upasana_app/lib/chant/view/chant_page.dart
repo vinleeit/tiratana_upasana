@@ -55,7 +55,15 @@ class _ChantPageState extends State<ChantPage> {
                   Row(
                     children: [
                       IconButton(
-                        onPressed: () {},
+                        onPressed: (currentChantIndex == 0)
+                            ? null
+                            : () {
+                                if (currentChantIndex - 1 >= 0) {
+                                  setState(() {
+                                    currentChantIndex -= 1;
+                                  });
+                                }
+                              },
                         icon: const Icon(Icons.arrow_back_ios_new_rounded),
                       ),
                       const SizedBox(width: 8),
@@ -91,7 +99,17 @@ class _ChantPageState extends State<ChantPage> {
                       ),
                       const SizedBox(width: 8),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: (currentChantIndex == chants.length - 1)
+                            ? null
+                            : () {
+                                setState(() {
+                                  if (currentChantIndex + 1 < chants.length) {
+                                    setState(() {
+                                      currentChantIndex += 1;
+                                    });
+                                  }
+                                });
+                              },
                         icon: const Icon(Icons.arrow_forward_ios_rounded),
                       ),
                     ],
