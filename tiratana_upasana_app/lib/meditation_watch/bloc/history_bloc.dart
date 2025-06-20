@@ -15,16 +15,15 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
     required MeditationRecordRepository meditationRecordRepository,
   })  : _meditationRecordRepository = meditationRecordRepository,
         super(const HistoryInitialState()) {
-    on<InitializeData>(_onInitializeData);
+    on<InitializeHistory>(_onInitializeData);
     on<AddHistory>(_onAddHistory);
     on<RemoveHistory>(_onRemoveHistory);
   }
 
   final MeditationRecordRepository _meditationRecordRepository;
 
-  void _onInitializeData(InitializeData event, Emitter<HistoryState> emit) {
-    final meditationRecords = _meditationRecordRepository.store
-        .box<MeditationRecord>()
+  void _onInitializeData(InitializeHistory event, Emitter<HistoryState> emit) {
+    final meditationRecords = _meditationRecordRepository.box
         .query()
         .order(MeditationRecord_.meditationStartTime, flags: Order.descending)
         .build()
@@ -49,9 +48,7 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
 
   FutureOr<void> _onAddHistory(AddHistory event, Emitter<HistoryState> emit) {
     final newMeditationRecord = event.meditationRecord;
-    _meditationRecordRepository.store
-        .box<MeditationRecord>()
-        .put(newMeditationRecord);
+    _meditationRecordRepository.box.put(newMeditationRecord);
 
     if (state is! HistoryReadyState) {
       emit(
@@ -73,7 +70,7 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
     RemoveHistory event,
     Emitter<HistoryState> emit,
   ) {
-    _meditationRecordRepository.store.box<MeditationRecord>().remove(event.id);
+    _meditationRecordRepository.box.remove(event.id);
 
     if (state is HistoryReadyState) {
       emit(

@@ -8,6 +8,10 @@ sealed class MeditationTimerEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+final class InitializeMeditationTimer extends MeditationTimerEvent {
+  const InitializeMeditationTimer();
+}
+
 final class StartTimer extends MeditationTimerEvent {
   const StartTimer();
 }

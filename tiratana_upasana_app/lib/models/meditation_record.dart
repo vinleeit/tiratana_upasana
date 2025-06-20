@@ -5,7 +5,6 @@ final class MeditationRecord {
   MeditationRecord({
     required this.meditationStartTime,
     required this.meditationDuration,
-    this.id = 0,
     this.meditationNote = '',
   });
 

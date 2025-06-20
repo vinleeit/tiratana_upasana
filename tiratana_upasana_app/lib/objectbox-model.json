@@ -31,9 +31,28 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "2:6541389482037926505",
+      "lastPropertyId": "2:6392566968567848402",
+      "name": "AppCache",
+      "properties": [
+        {
+          "id": "1:5199511701524115266",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6392566968567848402",
+          "name": "cachedMeditationWatchStartTime",
+          "type": 10
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "1:5086123549889689050",
+  "lastEntityId": "2:6541389482037926505",
   "lastIndexId": "0:0",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

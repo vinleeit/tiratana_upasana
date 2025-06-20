@@ -19,13 +19,18 @@ class WatchView extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const SelectableText(
+                  Text(
                     'Elapsed time:',
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   BlocBuilder<StopwatchBloc, MeditationTimerState>(
                     builder: (context, state) {
                       final elapsed = state.elapsed;
-                      final minutes = ((elapsed / 1000) / 60)
+                      final hours = ((elapsed / 1000) / 3600)
+                           .floor()
+                          .toString()
+                          .padLeft(2, '0');
+                      final minutes = ((elapsed / 1000) / 60 % 60)
                           .floor()
                           .toString()
                           .padLeft(2, '0');
@@ -34,11 +39,8 @@ class WatchView extends StatelessWidget {
                           .toString()
                           .padLeft(2, '0');
                       return Text(
-                        '$minutes:$seconds',
-                        style: const TextStyle(
-                          fontSize: 60,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        '$hours:$minutes:$seconds',
+                        style: Theme.of(context).textTheme.displayMedium,
                       );
                     },
                   ),

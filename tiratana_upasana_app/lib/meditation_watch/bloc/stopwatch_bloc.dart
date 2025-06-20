@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tiratana_upasana_app/models/meditation_record.dart';
 import 'package:tiratana_upasana_app/objectbox.g.dart';
+import 'package:tiratana_upasana_app/repositories/app_cache_repository.dart';
 import 'package:tiratana_upasana_app/repositories/meditation_record_repository.dart';
 
 part 'stopwatch_event.dart';
@@ -14,16 +15,18 @@ part 'stopwatch_state.dart';
 class StopwatchBloc extends Bloc<MeditationTimerEvent, MeditationTimerState> {
   StopwatchBloc({
     required MeditationRecordRepository meditationRecordRepository,
+    required AppCacheRepository appCacheRecordRepository,
   })  : _meditationRecordRepository = meditationRecordRepository,
+        _appCacheRepository = appCacheRecordRepository,
         super(const MeditationTimerInitial()) {
+    on<InitializeMeditationTimer>(_onInitializeData);
     on<StartTimer>(_onStartTimer);
     on<_TimerTick>(_onTimerTick);
     on<StopTimer>(_onStopTimer);
     on<UpdateNote>(_onUpdateNote);
     on<SaveRecord>(_onSaveRecord);
 
-    final meditationRecords = _meditationRecordRepository.store
-        .box<MeditationRecord>()
+    final meditationRecords = _meditationRecordRepository.box
         .query()
         .order(MeditationRecord_.meditationStartTime)
         .build()
@@ -42,6 +45,7 @@ class StopwatchBloc extends Bloc<MeditationTimerEvent, MeditationTimerState> {
   }
 
   late final MeditationRecordRepository _meditationRecordRepository;
+  late final AppCacheRepository _appCacheRepository;
   static const int _tickDuration = 1000; // milliseconds
   Timer? _timer;
 
@@ -53,9 +57,12 @@ class StopwatchBloc extends Bloc<MeditationTimerEvent, MeditationTimerState> {
 
   void _onStartTimer(StartTimer event, Emitter<MeditationTimerState> emit) {
     if (state is MeditationTimerInitial) {
+      final startTime = DateTime.now();
+      _appCacheRepository.data = _appCacheRepository.data
+        ..cachedMeditationWatchStartTime = startTime;
       emit(
         MeditationTimerRunning(
-          startTime: DateTime.now(),
+          startTime: startTime,
           elapsed: state.elapsed,
         ),
       );
@@ -79,6 +86,8 @@ class StopwatchBloc extends Bloc<MeditationTimerEvent, MeditationTimerState> {
   void _onStopTimer(StopTimer event, Emitter<MeditationTimerState> emit) {
     if (state is MeditationTimerRunning) {
       _timer?.cancel();
+      _appCacheRepository.data = _appCacheRepository.data
+        ..cachedMeditationWatchStartTime = null;
       emit(
         MeditationTimerStopped(
           startTime: state.startTime,
@@ -107,5 +116,29 @@ class StopwatchBloc extends Bloc<MeditationTimerEvent, MeditationTimerState> {
     Emitter<MeditationTimerState> emit,
   ) async {
     emit(const MeditationTimerInitial());
+  }
+
+  FutureOr<void> _onInitializeData(
+    InitializeMeditationTimer event,
+    Emitter<MeditationTimerState> emit,
+  ) {
+    final startTime = _appCacheRepository.data.cachedMeditationWatchStartTime;
+    if (startTime == null) {
+      return null;
+    }
+    final elapsed = DateTime.now().difference(startTime).inMilliseconds;
+    emit(
+      MeditationTimerRunning(
+        startTime: startTime,
+        elapsed: elapsed,
+      ),
+    );
+    _timer?.cancel();
+    _timer = Timer.periodic(
+      const Duration(milliseconds: _tickDuration),
+      (timer) {
+        add(_TimerTick(elapsed: state.elapsed + _tickDuration));
+      },
+    );
   }
 }

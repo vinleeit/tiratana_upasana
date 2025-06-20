@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tiratana_upasana_app/home/view/home_page.dart';
 import 'package:tiratana_upasana_app/l10n/arb/app_localizations.dart';
+import 'package:tiratana_upasana_app/repositories/app_cache_repository.dart';
 import 'package:tiratana_upasana_app/repositories/meditation_record_repository.dart';
 import 'package:tiratana_upasana_app/repositories/store_repository.dart';
 
@@ -22,6 +23,9 @@ class App extends StatelessWidget {
           RepositoryProvider<MeditationRecordRepository>(
             create: (_) =>
                 MeditationRecordRepository(store: _storeRepository.store),
+          ),
+          RepositoryProvider<AppCacheRepository>(
+            create: (_) => AppCacheRepository(store: _storeRepository.store),
           ),
         ],
         child: MaterialApp(

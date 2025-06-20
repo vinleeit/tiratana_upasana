@@ -8,7 +8,7 @@ sealed class HistoryEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class InitializeData extends HistoryEvent {}
+class InitializeHistory extends HistoryEvent {}
 
 class AddHistory extends HistoryEvent {
   const AddHistory({
