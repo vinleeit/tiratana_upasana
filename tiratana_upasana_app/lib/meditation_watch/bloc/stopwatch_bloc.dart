@@ -58,8 +58,9 @@ class StopwatchBloc extends Bloc<MeditationTimerEvent, MeditationTimerState> {
   void _onStartTimer(StartTimer event, Emitter<MeditationTimerState> emit) {
     if (state is MeditationTimerInitial) {
       final startTime = DateTime.now();
-      _appCacheRepository.data = _appCacheRepository.data
-        ..cachedMeditationWatchStartTime = startTime;
+      _appCacheRepository
+        ..data.cachedMeditationWatchStartTime = startTime
+        ..flush();
       emit(
         MeditationTimerRunning(
           startTime: startTime,
@@ -86,8 +87,9 @@ class StopwatchBloc extends Bloc<MeditationTimerEvent, MeditationTimerState> {
   void _onStopTimer(StopTimer event, Emitter<MeditationTimerState> emit) {
     if (state is MeditationTimerRunning) {
       _timer?.cancel();
-      _appCacheRepository.data = _appCacheRepository.data
-        ..cachedMeditationWatchStartTime = null;
+      _appCacheRepository
+        ..data.cachedMeditationWatchStartTime = null
+        ..flush();
       emit(
         MeditationTimerStopped(
           startTime: state.startTime,

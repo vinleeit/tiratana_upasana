@@ -24,7 +24,10 @@ class _TocBottomSheetState extends State<TocBottomSheet>
       animationController: BottomSheet.createAnimationController(this),
       builder: (BuildContext context) {
         return Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(
+            vertical: 16,
+            horizontal: 24,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [

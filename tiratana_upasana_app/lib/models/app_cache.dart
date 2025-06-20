@@ -4,10 +4,12 @@ import 'package:objectbox/objectbox.dart';
 final class AppCache {
   AppCache({
     this.cachedMeditationWatchStartTime,
+    this.chantJsonPath = '',
   });
 
   @Id()
   int id = 0;
 
   DateTime? cachedMeditationWatchStartTime;
+  String chantJsonPath;
 }

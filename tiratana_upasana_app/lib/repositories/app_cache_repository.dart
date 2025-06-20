@@ -6,23 +6,26 @@ final class AppCacheRepository {
     required Store store,
   }) {
     _store = store;
+    _box = _store.box<AppCache>();
+
+    // Load app cache
+    var data = _box.get(1);
+    if (data == null) {
+      data = AppCache();
+      _box.put(data);
+    }
+    _data = data;
   }
 
   late final Store _store;
+  late final Box<AppCache> _box;
+  late final AppCache _data;
 
   AppCache get data {
-    final box = _store.box<AppCache>();
-    var data = box.get(1);
-    if (data == null) {
-      data = AppCache();
-      box.put(data);
-    }
-    return data;
+    return _data;
   }
 
-  set data(AppCache data) {
-    final box = _store.box<AppCache>();
-    data.id = 1;
-    box.put(data, mode: PutMode.update);
+  void flush() {
+    _box.put(_data, mode: PutMode.update);
   }
 }

@@ -57,7 +57,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 6541389482037926505),
     name: 'AppCache',
-    lastPropertyId: const obx_int.IdUid(2, 6392566968567848402),
+    lastPropertyId: const obx_int.IdUid(3, 7779849699668132475),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -70,6 +70,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(2, 6392566968567848402),
         name: 'cachedMeditationWatchStartTime',
         type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 7779849699668132475),
+        name: 'chantJsonPath',
+        type: 9,
         flags: 0,
       ),
     ],
@@ -181,12 +187,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
         object.id = id;
       },
       objectToFB: (AppCache object, fb.Builder fbb) {
-        fbb.startTable(3);
+        final chantJsonPathOffset = fbb.writeString(object.chantJsonPath);
+        fbb.startTable(4);
         fbb.addInt64(0, object.id);
         fbb.addInt64(
           1,
           object.cachedMeditationWatchStartTime?.millisecondsSinceEpoch,
         );
+        fbb.addOffset(2, chantJsonPathOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -201,8 +209,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
                 : DateTime.fromMillisecondsSinceEpoch(
                   cachedMeditationWatchStartTimeValue,
                 );
+        final chantJsonPathParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
         final object = AppCache(
           cachedMeditationWatchStartTime: cachedMeditationWatchStartTimeParam,
+          chantJsonPath: chantJsonPathParam,
         )..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
 
         return object;
@@ -246,5 +258,10 @@ class AppCache_ {
   /// See [AppCache.cachedMeditationWatchStartTime].
   static final cachedMeditationWatchStartTime = obx.QueryDateProperty<AppCache>(
     _entities[1].properties[1],
+  );
+
+  /// See [AppCache.chantJsonPath].
+  static final chantJsonPath = obx.QueryStringProperty<AppCache>(
+    _entities[1].properties[2],
   );
 }
