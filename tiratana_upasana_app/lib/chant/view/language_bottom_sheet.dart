@@ -55,28 +55,34 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
               ),
               const SizedBox(height: 16),
               Expanded(
-                child: ListView(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  children: [
-                    for (final iso in widget.isos)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: ListTile(
-                          title: Text(iso),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(60),
-                            side: const BorderSide(
-                              color: Colors.grey,
+                child: Material(
+                  color: Colors.transparent,
+                  child: Scrollbar(
+                    child: ListView.builder(
+                      itemCount: widget.isos.length,
+                      padding:
+                          const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      itemBuilder: (context, index) {
+                        final iso = widget.isos[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: ListTile(
+                            title: Text(iso),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(60),
+                              side: const BorderSide(
+                                color: Colors.grey,
+                              ),
                             ),
+                            onTap: () {
+                              Navigator.pop(context, iso);
+                            },
+                            dense: true,
                           ),
-                          onTap: () {
-                            Navigator.pop(context, iso);
-                          },
-                          dense: true,
-                        ),
-                      ),
-                  ],
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ),
             ],

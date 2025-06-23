@@ -37,37 +37,41 @@ class _TocBottomSheetState extends State<TocBottomSheet>
               ),
               const SizedBox(height: 12),
               Expanded(
-                child: ListView(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  children: [
-                    for (final chant in widget.chants)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: ListTile(
-                          title: Text(chant.defaultContent.title),
-                          selected: chant == widget.currentChant,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(60),
-                            side: const BorderSide(
-                              color: Colors.grey,
+                child: Material(
+                  color: Colors.transparent,
+                  child: Scrollbar(
+                    child: ListView.builder(
+                      itemCount: widget.chants.length,
+                      padding:
+                          const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      itemBuilder: (context, index) {
+                        final chant = widget.chants[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: ListTile(
+                            title: Text(chant.defaultContent.title),
+                            selected: chant == widget.currentChant,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(60),
+                              side: const BorderSide(
+                                color: Colors.grey,
+                              ),
                             ),
+                            onTap: () {
+                              Navigator.pop(
+                                context,
+                                (chant.id == widget.currentChant.id) ? null : chant,
+                              );
+                            },
+                            trailing: (chant == widget.currentChant)
+                                ? const Icon(Icons.check_rounded)
+                                : null,
+                            dense: true,
                           ),
-                          onTap: () {
-                            Navigator.pop(
-                              context,
-                              (chant.id == widget.currentChant.id)
-                                  ? null
-                                  : chant,
-                            );
-                          },
-                          trailing: (chant == widget.currentChant)
-                              ? const Icon(Icons.check_rounded)
-                              : null,
-                          dense: true,
-                        ),
-                      ),
-                  ],
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ),
             ],
