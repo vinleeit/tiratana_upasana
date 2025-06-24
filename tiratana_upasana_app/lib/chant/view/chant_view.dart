@@ -1,4 +1,3 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -6,30 +5,14 @@ import 'package:markdown/markdown.dart' as md;
 import 'package:tiratana_upasana_app/chant/bloc/chant_bloc.dart';
 import 'package:tiratana_upasana_app/chant/models/chant.dart';
 import 'package:tiratana_upasana_app/chant/view/language_bottom_sheet.dart';
+import 'package:tiratana_upasana_app/chant/view/settings_bottom_sheet.dart';
 import 'package:tiratana_upasana_app/chant/view/toc_bottom_sheet.dart';
-import 'package:tiratana_upasana_app/widgets/unimplemented_feature_alert_dialog.dart';
 
 class ChantView extends StatelessWidget {
   const ChantView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    void showLoadJson(BuildContext context) {
-      FilePicker.platform.pickFiles(
-        allowedExtensions: ['json'],
-        type: FileType.custom,
-      ).then(
-        (value) {
-          if (value == null || value.paths.isEmpty || !context.mounted) return;
-          context.read<ChantBloc>().add(
-                LoadChantFromJsonFile(
-                  filePath: value.paths.first!,
-                ),
-              );
-        },
-      );
-    }
-
     void showTOC(
       BuildContext context,
       Chant currentChant,
@@ -159,7 +142,7 @@ class ChantView extends StatelessWidget {
                 Tooltip(
                   message: 'Import',
                   child: ElevatedButton(
-                    onPressed: () => showLoadJson(context),
+                    onPressed: null,
                     style: ButtonStyle(
                       padding: WidgetStateProperty.all(
                         const EdgeInsets.symmetric(
@@ -175,7 +158,7 @@ class ChantView extends StatelessWidget {
                       ),
                       visualDensity: VisualDensity.compact,
                     ),
-                    child: const Icon(Icons.file_upload_outlined),
+                    child: null,
                   ),
                 ),
                 Expanded(
@@ -228,11 +211,16 @@ class ChantView extends StatelessWidget {
                 Tooltip(
                   message: 'Settings',
                   child: ElevatedButton(
-                    onPressed: () => showDialog<void>(
-                      context: context,
-                      builder: (context) =>
-                          const UnimplementedFeatureAlertDialog(),
-                    ),
+                    onPressed: () {
+                      showModalBottomSheet<void>(
+                        context: context,
+                        showDragHandle: true,
+                        builder: (_) => BlocProvider.value(
+                          value: context.read<ChantBloc>(),
+                          child: const SettingsBottomSheet(),
+                        ),
+                      );
+                    },
                     style: ButtonStyle(
                       padding: WidgetStateProperty.all(
                         const EdgeInsets.symmetric(
@@ -287,6 +275,13 @@ class ChantView extends StatelessWidget {
               child: SelectionArea(
                 child: Html(
                   data: dataStr,
+                  style: {
+                    'body': Style(
+                      fontSize: FontSize(
+                        state.fontSize,
+                      ),
+                    ),
+                  },
                 ),
               ),
             ),

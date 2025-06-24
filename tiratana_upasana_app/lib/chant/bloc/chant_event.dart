@@ -33,3 +33,11 @@ class ChangeChantContent extends ChantEvent {
 
   final String iso;
 }
+
+class ChangeFontSize extends ChantEvent {
+  const ChangeFontSize({
+    required this.fontSize,
+  });
+
+  final double fontSize;
+}

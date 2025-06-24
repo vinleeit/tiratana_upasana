@@ -1,6 +1,6 @@
 name: tiratana_upasana_app
 description: A Flutter application containing Buddhism related services.
-version: 1.0.0+8
+version: 1.0.0+9
 publish_to: none
 
 environment:

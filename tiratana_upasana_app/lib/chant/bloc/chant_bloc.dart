@@ -20,6 +20,7 @@ class ChantBloc extends Bloc<ChantEvent, ChantState> {
     on<LoadChantFromJsonFile>(_onLoadChantFromJsonFile);
     on<ChangeChant>(_onChangeChant);
     on<ChangeChantContent>(_onChangeChantContent);
+    on<ChangeFontSize>(_onChangeFontSize);
   }
 
   final AppCacheRepository _appCacheRepository;
@@ -51,6 +52,7 @@ class ChantBloc extends Bloc<ChantEvent, ChantState> {
             ChantReadyState(
               chants: chants,
               currentChantIndex: 0,
+              fontSize: state.fontSize,
             ),
           );
         } catch (e) {
@@ -93,6 +95,7 @@ class ChantBloc extends Bloc<ChantEvent, ChantState> {
         ChantReadyState(
           chants: chants,
           currentChantIndex: 0,
+          fontSize: state.fontSize,
         ),
       );
     } catch (e) {
@@ -112,6 +115,7 @@ class ChantBloc extends Bloc<ChantEvent, ChantState> {
       ChantReadyState(
         chants: [...state.chants],
         currentChantIndex: event.index,
+        fontSize: state.fontSize,
       ),
     );
   }
@@ -131,6 +135,20 @@ class ChantBloc extends Bloc<ChantEvent, ChantState> {
       ChantReadyState(
         chants: [...state.chants],
         currentChantIndex: state.currentChantIndex,
+        fontSize: state.fontSize,
+      ),
+    );
+  }
+
+  FutureOr<void> _onChangeFontSize(
+    ChangeFontSize event,
+    Emitter<ChantState> emit,
+  ) {
+    emit(
+      ChantReadyState(
+        chants: [...state.chants],
+        currentChantIndex: state.currentChantIndex,
+        fontSize: event.fontSize,
       ),
     );
   }
